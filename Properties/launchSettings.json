@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "mymonogame": {
+      "commandName": "Project",
+      "workingDirectory": "D:\\playground\\mymonogame"
+    }
+  }
+}
