@@ -39,7 +39,7 @@ namespace mymonogame
         }
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || InputManager.Instance.KeyDown(Keys.Escape))
                 Exit();
 
             ScreenManager.Instance.Update(gameTime);
