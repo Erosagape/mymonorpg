@@ -26,7 +26,7 @@ namespace mymonogame
             Image.Update(gameTime);
             if(Keyboard.GetState().IsKeyDown(Keys.Enter) && !ScreenManager.Instance.IsTransitioning)
             {
-                ScreenManager.Instance.ChangeScreen("SplashScreen");
+                ScreenManager.Instance.ChangeScreens("SplashScreen");
             }
         }
         public override void Draw(SpriteBatch spriteBatch)

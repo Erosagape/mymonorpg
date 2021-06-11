@@ -11,28 +11,37 @@ namespace mymonogame
     public class ScreenManager
     {
         private static ScreenManager instance;
-        GameScreen currentScreen,newScreen;
         [XmlIgnore]
+        public Vector2 Dimensions { private set; get; }
+        [XmlIgnore]
+        public ContentManager Content { private set; get; }
         XmlManager<GameScreen> xmlGameScreenManager;
-        [XmlIgnore]
-        public Vector2 Dimensions { get; set; }
-        [XmlIgnore]
-        public ContentManager Content { get; set; }
+
+        GameScreen currentScreen, newScreen;
         [XmlIgnore]
         public GraphicsDevice GraphicsDevice;
         [XmlIgnore]
         public SpriteBatch SpriteBatch;
+
         public Image Image;
         [XmlIgnore]
-        public bool IsTransitioning { get; set; }
-        public ScreenManager()
-        {
-            Dimensions = new Vector2(640, 480);
-            xmlGameScreenManager = new XmlManager<GameScreen>();
+        public bool IsTransitioning { get; private set; }
 
-            LoadSplashScreen();
+        public static ScreenManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    XmlManager<ScreenManager> xml = new XmlManager<ScreenManager>();
+                    instance = xml.Load("Load/ScreenManager.xml");
+                }
+
+                return instance;
+            }
         }
-        public void ChangeScreen(string screenName)
+
+        public void ChangeScreens(string screenName)
         {
             newScreen = (GameScreen)Activator.CreateInstance(Type.GetType("mymonogame." + screenName));
             Image.IsActive = true;
@@ -40,6 +49,7 @@ namespace mymonogame
             Image.Alpha = 0.0f;
             IsTransitioning = true;
         }
+
         void Transition(GameTime gameTime)
         {
             if (IsTransitioning)
@@ -51,55 +61,45 @@ namespace mymonogame
                     currentScreen = newScreen;
                     xmlGameScreenManager.Type = currentScreen.Type;
                     if (File.Exists(currentScreen.XmlPath))
-                       xmlGameScreenManager.Load(currentScreen.XmlPath);
+                        currentScreen = xmlGameScreenManager.Load(currentScreen.XmlPath);
                     currentScreen.LoadContent();
-                } else if (Image.Alpha == 0.0f)
+                }
+                else if (Image.Alpha == 0.0f)
                 {
                     Image.IsActive = false;
                     IsTransitioning = false;
                 }
             }
         }
-        private void LoadSplashScreen()
+
+        public ScreenManager()
         {
+            Dimensions = new Vector2(640, 480);
             currentScreen = new SplashScreen();
+            xmlGameScreenManager = new XmlManager<GameScreen>();
             xmlGameScreenManager.Type = currentScreen.Type;
             currentScreen = xmlGameScreenManager.Load("Load/SplashScreen.xml");
         }
-        public static ScreenManager Instance 
-        { 
-            get
-            {
-                if (instance == null)
-                {
-                    XmlManager<ScreenManager> xml = new XmlManager<ScreenManager>();
-                    instance = xml.Load("Load/ScreenManager.xml");
-                }
-                return instance;
-            }
-        }
-        public static void Setup(GraphicsDevice device,SpriteBatch spriteBatch,ContentManager content)
+
+        public void LoadContent(ContentManager Content)
         {
-            instance.GraphicsDevice = device;
-            instance.SpriteBatch = spriteBatch;
-            instance.LoadContent(content);
-        }
-        public void LoadContent(ContentManager content)
-        {
-            this.Content = new ContentManager(content.ServiceProvider, "Content");
+            this.Content = new ContentManager(Content.ServiceProvider, "Content");
             currentScreen.LoadContent();
             Image.LoadContent();
         }
+
         public void UnloadContent()
         {
             currentScreen.UnloadContent();
             Image.UnloadContent();
         }
+
         public void Update(GameTime gameTime)
         {
             currentScreen.Update(gameTime);
             Transition(gameTime);
         }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             currentScreen.Draw(spriteBatch);

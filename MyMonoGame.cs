@@ -28,7 +28,9 @@ namespace mymonogame
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            ScreenManager.Setup(GraphicsDevice, spriteBatch, Content);
+            ScreenManager.Instance.GraphicsDevice = GraphicsDevice;
+            ScreenManager.Instance.SpriteBatch = spriteBatch;
+            ScreenManager.Instance.LoadContent(Content);
         }
         protected override void UnloadContent()
         {
